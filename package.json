@@ -1,0 +1,17 @@
+{
+    "license": "MIT",
+    "scripts": {
+        "build": "webpack-cli --mode development",
+        "buildStyles": "node-sass --output-style compressed styles/App.scss > build/style.css",
+        "buildProd": "webpack-cli --mode production",
+        "ship": "yarn buildStyles & yarn buildProd"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "node-sass": "^4.13.0",
+        "ts-loader": "^6.2.1",
+        "typescript": "^3.7.3",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.10"
+    }
+}
