@@ -1,5 +1,5 @@
 import { Tile } from "./Tile";
-import { Factory } from "./utils/Factory";
+import { Factory } from "./common/Factory";
 import { OffscreenCanvas } from "./common/OffscreenCanvas";
 import { WorldConfig } from "./WorldConfig";
 
@@ -21,21 +21,27 @@ export class Chunk {
 
         const { chunkSize, tileSize } = worldConfig;
         const offscreenCanvasSize = chunkSize * tileSize;
+        const chunkOffsetX = this.x * chunkSize;
+        const chunkOffsetY = this.y * chunkSize;
 
-        this.tiles = Factory.createTwoDimensionalArray(chunkSize, chunkSize, (x, y) => this.createTile(x, y, tileHeightMethod(x, y)));
+        this.tiles = Factory.createTwoDimensionalArray(chunkSize, chunkSize, (x, y) => {
+            const globalX = chunkOffsetX + x;
+            const globalY = chunkOffsetY + y;
+
+            return {
+                x: x,
+                y: y,
+                globalX: chunkOffsetX + x,
+                globalY: chunkOffsetY + y,
+                key: `${globalX}_${globalY}`,
+                chunk: this,
+                height: tileHeightMethod(x, y),
+                neighbors: Factory.createDirectionMap(null)
+            };
+        });
         this.offscreenCanvas = new OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
 
         this.renderOffscreen();
-    }
-
-    private createTile(x: number, y: number, height: number): Tile {
-        return {
-            x: x,
-            y: y,
-            chunk: this,
-            height: height,
-            neighbors: Factory.createDirectionMap(null)
-        };
     }
 
     private renderOffscreen() {

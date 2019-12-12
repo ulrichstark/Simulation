@@ -1,17 +1,17 @@
-import { Factory } from "./utils/Factory";
+import { Factory } from "./common/Factory";
 import { WorldConfig } from "./WorldConfig";
 import { Chunk } from "./Chunk";
 import { Logger } from "./common/Logger";
 import { SimplexNoise } from "./common/SimplexNoise";
-import { Direction, DirectionVectors } from "./common/Direction";
+import { Directions } from "./common/Direction";
 
 const logger = new Logger("World");
 
 export class World {
     private noise: SimplexNoise;
-    private width: number;
-    private height: number;
 
+    public width: number;
+    public height: number;
     public config: WorldConfig;
     public chunks: Chunk[][];
 
@@ -40,11 +40,11 @@ export class World {
                         const tileX = chunkX + tx;
                         const tileY = chunkY + ty;
 
-                        for (const vector of DirectionVectors) {
+                        for (const vector of Directions) {
                             const x = tileX + vector.x;
                             const y = tileY + vector.y;
 
-                            tile.neighbors[vector.direction] = this.getTile(x, y);
+                            tile.neighbors[vector.key] = this.getTile(x, y);
                         }
                     }
                 }
@@ -77,5 +77,13 @@ export class World {
             const chunk = this.chunks[Math.floor(x / chunkSize)][Math.floor(y / chunkSize)];
             return chunk.tiles[x % chunkSize][y % chunkSize];
         }
+    }
+
+    public getTileRandom() {
+        const x = Math.floor(Math.random() * this.width);
+        const y = Math.floor(Math.random() * this.height);
+        const { chunkSize } = this.config;
+        const chunk = this.chunks[Math.floor(x / chunkSize)][Math.floor(y / chunkSize)];
+        return chunk.tiles[x % chunkSize][y % chunkSize];
     }
 }

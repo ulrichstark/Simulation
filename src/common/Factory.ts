@@ -1,4 +1,4 @@
-import { DirectionMap, Direction } from "../common/Direction";
+import { DirectionMap, DirectionKey } from "./Direction";
 
 export class Factory {
     public static createTwoDimensionalArray<T>(width: number, height: number, defaultValue: (x: number, y: number) => T): T[][] {
@@ -14,14 +14,14 @@ export class Factory {
 
     public static createDirectionMap<T>(defaultValue: T): DirectionMap<T> {
         return {
-            [Direction.TOP]: defaultValue,
-            [Direction.TOP_RIGHT]: defaultValue,
-            [Direction.RIGHT]: defaultValue,
-            [Direction.BOTTOM_RIGHT]: defaultValue,
-            [Direction.BOTTOM]: defaultValue,
-            [Direction.BOTTOM_LEFT]: defaultValue,
-            [Direction.LEFT]: defaultValue,
-            [Direction.TOP_LEFT]: defaultValue
+            [DirectionKey.TOP]: defaultValue,
+            [DirectionKey.TOP_RIGHT]: defaultValue,
+            [DirectionKey.RIGHT]: defaultValue,
+            [DirectionKey.BOTTOM_RIGHT]: defaultValue,
+            [DirectionKey.BOTTOM]: defaultValue,
+            [DirectionKey.BOTTOM_LEFT]: defaultValue,
+            [DirectionKey.LEFT]: defaultValue,
+            [DirectionKey.TOP_LEFT]: defaultValue
         };
     }
 }

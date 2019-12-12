@@ -1,0 +1,78 @@
+import { PathAgentDefinition } from "./PathAgentDefinition";
+import { Tile } from "../Tile";
+import { PathAgentNode } from "./PathAgentNode";
+import { Directions } from "../common/Direction";
+
+export class PathAgent {
+    private definition: PathAgentDefinition;
+
+    constructor(definition: PathAgentDefinition) {
+        this.definition = definition;
+    }
+
+    public findPath(from: Tile, to: Tile): Tile[] | null {
+        const fromNode: PathAgentNode = {
+            tile: from,
+            parent: null,
+            score: 0
+        };
+        const openNodes = [fromNode];
+        const openedNodes = { [from.key]: true };
+
+        while (true) {
+            const node = openNodes.shift();
+
+            if (!node) {
+                return null;
+            }
+
+            const { tile } = node;
+
+            if (tile === to) {
+                // TODO: Pathfinding optimization possible
+                const tiles: Tile[] = [];
+                let currentNode = node;
+                while (currentNode.parent) {
+                    tiles.unshift(currentNode.tile);
+                    currentNode = currentNode.parent;
+                }
+                return tiles;
+            }
+
+            for (const direction of Directions) {
+                const possibleOpenTile = tile.neighbors[direction.key];
+
+                if (possibleOpenTile && !openedNodes[possibleOpenTile.key]) {
+                    const cost = this.definition.getCost(tile, possibleOpenTile, direction);
+
+                    if (cost !== null) {
+                        const distance = this.definition.getDistance(possibleOpenTile, to);
+                        const score = node.score + cost + distance;
+
+                        const nextNode: PathAgentNode = {
+                            tile: possibleOpenTile,
+                            parent: node,
+                            score: score
+                        };
+
+                        openedNodes[possibleOpenTile.key] = true;
+
+                        // TODO: Pathfinding optimization possible
+                        let inserted = false;
+                        for (let i = 0; i < openNodes.length; i++) {
+                            if (openNodes[i].score >= score) {
+                                openNodes.splice(i, 0, nextNode);
+                                inserted = true;
+                                break;
+                            }
+                        }
+
+                        if (!inserted) {
+                            openNodes.push(nextNode);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
