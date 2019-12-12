@@ -1,8 +1,8 @@
-import { Chunk } from "./Chunk";
-import { Tile } from "./Tile";
-import { World } from "./World";
+import { Chunk } from "./world/Chunk";
+import { Tile } from "./world/Tile";
+import { World } from "./world/World";
 import { Actions, ActionCameraMove } from "./Actions";
-import { WorldView } from "./WorldView";
+import { WorldView } from "./world/WorldView";
 
 type ActionCallback = (action: Actions) => void;
 

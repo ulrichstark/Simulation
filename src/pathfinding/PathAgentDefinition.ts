@@ -1,4 +1,4 @@
-import { Tile } from "../Tile";
+import { Tile } from "../world/Tile";
 import { Direction } from "../common/Direction";
 
 export interface PathAgentDefinition {

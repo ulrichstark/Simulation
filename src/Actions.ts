@@ -1,4 +1,4 @@
-import { Tile } from "./Tile";
+import { Tile } from "./world/Tile";
 
 export interface Action<T extends string> {
     key: T;

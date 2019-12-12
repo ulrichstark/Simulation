@@ -1,4 +1,4 @@
-import { WorldConfig } from "./WorldConfig";
+import { WorldConfig } from "./world/WorldConfig";
 import { Game } from "./Game";
 
 const worldConfig: WorldConfig = {

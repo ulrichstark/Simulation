@@ -1,11 +1,11 @@
 import { GameCanvas } from "./GameCanvas";
-import { World } from "./World";
-import { WorldConfig } from "./WorldConfig";
-import { WorldRenderer } from "./WorldRenderer";
+import { World } from "./world/World";
+import { WorldConfig } from "./world/WorldConfig";
+import { WorldRenderer } from "./world/WorldRenderer";
 import { GameInput } from "./GameInput";
 import { Actions } from "./Actions";
-import { WorldView } from "./WorldView";
-import { Tile } from "./Tile";
+import { WorldView } from "./world/WorldView";
+import { Tile } from "./world/Tile";
 import { PathAgent } from "./pathfinding/PathAgent";
 import { Stopwatch } from "./common/Stopwatch";
 import { Timer } from "./common/Timer";

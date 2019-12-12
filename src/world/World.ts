@@ -1,9 +1,9 @@
-import { Factory } from "./common/Factory";
+import { Factory } from "../common/Factory";
 import { WorldConfig } from "./WorldConfig";
 import { Chunk } from "./Chunk";
-import { Logger } from "./common/Logger";
-import { SimplexNoise } from "./common/SimplexNoise";
-import { Directions } from "./common/Direction";
+import { Logger } from "../common/Logger";
+import { SimplexNoise } from "../common/SimplexNoise";
+import { Directions } from "../common/Direction";
 
 const logger = new Logger("World");
 

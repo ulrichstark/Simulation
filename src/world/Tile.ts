@@ -1,5 +1,5 @@
 import { Chunk } from "./Chunk";
-import { DirectionMap } from "./common/Direction";
+import { DirectionMap } from "../common/Direction";
 
 export interface Tile {
     x: number;

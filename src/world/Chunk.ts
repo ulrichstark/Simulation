@@ -1,6 +1,6 @@
 import { Tile } from "./Tile";
-import { Factory } from "./common/Factory";
-import { OffscreenCanvas } from "./common/OffscreenCanvas";
+import { Factory } from "../common/Factory";
+import { OffscreenCanvas } from "../common/OffscreenCanvas";
 import { WorldConfig } from "./WorldConfig";
 
 type TileHeightMethod = (x: number, y: number) => number;

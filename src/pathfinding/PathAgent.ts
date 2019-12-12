@@ -1,5 +1,5 @@
 import { PathAgentDefinition } from "./PathAgentDefinition";
-import { Tile } from "../Tile";
+import { Tile } from "../world/Tile";
 import { PathAgentNode } from "./PathAgentNode";
 import { Directions } from "../common/Direction";
 
