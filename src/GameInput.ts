@@ -38,10 +38,10 @@ export class GameInput {
     public update(pointerXPixel: number, pointerYPixel: number, worldView: WorldView) {
         const { chunks, config } = this.world;
         const { tileSize, chunkSize } = config;
-        const { positionX, positionY } = worldView;
+        const { pixelOffsetX, pixelOffsetY } = worldView;
 
-        this.pointerX = pointerXPixel / tileSize - positionX;
-        this.pointerY = pointerYPixel / tileSize - positionY;
+        this.pointerX = (pointerXPixel - pixelOffsetX) / tileSize;
+        this.pointerY = (pointerYPixel - pixelOffsetY) / tileSize;
 
         const chunkX = Math.floor(this.pointerX / chunkSize);
         const chunkY = Math.floor(this.pointerY / chunkSize);

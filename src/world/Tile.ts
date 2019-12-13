@@ -4,6 +4,8 @@ import { DirectionMap } from "../common/Direction";
 export interface Tile {
     x: number;
     y: number;
+    localPixelX: number;
+    localPixelY: number;
     globalX: number;
     globalY: number;
     key: string;

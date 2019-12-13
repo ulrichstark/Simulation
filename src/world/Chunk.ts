@@ -20,7 +20,6 @@ export class Chunk {
         this.worldConfig = worldConfig;
 
         const { chunkSize, tileSize } = worldConfig;
-        const offscreenCanvasSize = chunkSize * tileSize;
         const chunkOffsetX = this.x * chunkSize;
         const chunkOffsetY = this.y * chunkSize;
 
@@ -31,6 +30,8 @@ export class Chunk {
             return {
                 x: x,
                 y: y,
+                localPixelX: Math.floor(x * tileSize),
+                localPixelY: Math.floor(y * tileSize),
                 globalX: chunkOffsetX + x,
                 globalY: chunkOffsetY + y,
                 key: `${globalX}_${globalY}`,
@@ -39,9 +40,9 @@ export class Chunk {
                 neighbors: Factory.createDirectionMap(null)
             };
         });
-        this.offscreenCanvas = new OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
 
-        this.renderOffscreen();
+        const offscreenCanvasSize = chunkSize * tileSize;
+        this.offscreenCanvas = new OffscreenCanvas(offscreenCanvasSize, offscreenCanvasSize);
     }
 
     private renderOffscreen() {
@@ -52,8 +53,7 @@ export class Chunk {
         for (let ix = 0; ix < chunkSize; ix++) {
             for (let iy = 0; iy < chunkSize; iy++) {
                 const tile = tiles[ix][iy];
-                const x = Math.floor(tile.x * tileSize);
-                const y = Math.floor(tile.y * tileSize);
+                const { localPixelX: x, localPixelY: y } = tile;
 
                 canvasContext.fillStyle = `rgb(30, ${120 + tile.height * 15}, 30)`;
                 canvasContext.fillRect(x, y, tileSize, tileSize);

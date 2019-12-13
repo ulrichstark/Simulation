@@ -2,10 +2,10 @@ import { WorldConfig } from "./world/WorldConfig";
 import { Game } from "./Game";
 
 const worldConfig: WorldConfig = {
-    seed: 1, // Math.random(),
+    seed: Math.random(),
     noiseScale: 0.02,
-    chunksX: 6,
-    chunksY: 3,
+    chunksX: 14,
+    chunksY: 8,
     chunkSize: 32,
     tileSize: 8
 };

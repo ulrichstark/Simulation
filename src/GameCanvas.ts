@@ -1,10 +1,12 @@
-type FrameMethod = (deltaTime: number) => void;
+type FrameMethod = () => void;
+type ResizeMethod = () => void;
 
 const maxDeltaTime = 200;
 
 export class GameCanvas {
     private canvasElement: HTMLCanvasElement;
     private frameMethod: FrameMethod;
+    private resizeMethod: ResizeMethod;
     private lastTime: number | null = null;
     private upscalingFactor: number;
     private frameHandle: number;
@@ -14,9 +16,11 @@ export class GameCanvas {
     public height: number;
     public pointerX: number = -1;
     public pointerY: number = -1;
+    public deltaTime: number = 0;
 
-    constructor(frameMethod: FrameMethod) {
+    constructor(frameMethod: FrameMethod, resizeMethod: ResizeMethod) {
         this.frameMethod = frameMethod;
+        this.resizeMethod = resizeMethod;
         this.canvasElement = document.createElement("canvas");
         this.canvasContext = this.canvasElement.getContext("2d") as CanvasRenderingContext2D;
 
@@ -34,6 +38,8 @@ export class GameCanvas {
         this.canvasElement.width = this.width;
         this.canvasElement.height = this.height;
         this.canvasElement.setAttribute("style", `width: ${innerWidth}px; height: ${innerHeight}px`);
+
+        this.resizeMethod();
     }
 
     private scheduleFrame() {
@@ -43,13 +49,12 @@ export class GameCanvas {
     private handleFrame(time: number) {
         this.scheduleFrame();
 
-        let deltaTime = 0;
         if (this.lastTime !== null) {
-            deltaTime = Math.min(maxDeltaTime, time - this.lastTime);
+            this.deltaTime = Math.min(maxDeltaTime, time - this.lastTime);
         }
         this.lastTime = time;
 
-        this.frameMethod(deltaTime);
+        this.frameMethod();
     }
 
     private handleMouseMove(event: MouseEvent) {

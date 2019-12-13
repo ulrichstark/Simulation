@@ -31,15 +31,9 @@ export class Game {
         this.worldConfig = worldConfig;
         this.world = new World(worldConfig);
         this.worldRenderer = new WorldRenderer(this.world);
-        this.worldView = {
-            positionX: 0,
-            positionY: 0
-        };
-
-        this.handleAction = this.handleAction.bind(this);
-
-        this.input = new GameInput(this.world, this.handleAction);
-        this.canvas = new GameCanvas(this.render.bind(this));
+        this.input = new GameInput(this.world, this.onAction.bind(this));
+        this.canvas = new GameCanvas(this.onRender.bind(this), this.onResize.bind(this));
+        this.worldView = new WorldView(worldConfig, this.canvas, 0, 0);
 
         this.playerPosition = this.world.getTileRandom();
         this.pathAgent = new PathAgent({
@@ -83,12 +77,11 @@ export class Game {
         this.input.unmount();
     }
 
-    private handleAction(action: Actions) {
+    private onAction(action: Actions) {
         switch (action.key) {
             case "CAMERA_MOVE": {
                 const { deltaX, deltaY } = action;
-                this.worldView.positionX -= deltaX;
-                this.worldView.positionY -= deltaY;
+                this.worldView.move(deltaX, deltaY);
                 break;
             }
             case "TILE_CLICK": {
@@ -97,9 +90,13 @@ export class Game {
         }
     }
 
-    private render(deltaTime: number) {
+    private onResize() {
+        this.worldView.update();
+    }
+
+    private onRender() {
         const { worldConfig, worldRenderer, worldView, canvas, input } = this;
-        const { width, height, canvasContext, pointerX, pointerY } = canvas;
+        const { width, height, canvasContext, pointerX, pointerY, deltaTime } = canvas;
         const { tileSize } = worldConfig;
 
         if (this.playerTarget === null || this.playerPath === null || this.playerPath.length === 0) {
@@ -112,7 +109,7 @@ export class Game {
         input.update(pointerX, pointerY, worldView);
         const { hoveredChunk, hoveredTile, isPointerDown } = input;
 
-        if (isPointerDown && hoveredChunk && hoveredTile && hoveredTile.height >= 1) {
+        if (isPointerDown && hoveredChunk && hoveredTile) {
             hoveredTile.height = this.targetTileHeight;
             if (hoveredTile.neighbors.TOP) {
                 hoveredTile.neighbors.TOP.height = this.targetTileHeight;
@@ -134,11 +131,11 @@ export class Game {
         }
 
         canvasContext.clearRect(0, 0, width, height);
-        worldRenderer.render(canvasContext, worldView);
+        worldRenderer.render(canvas, worldView);
 
         if (hoveredChunk && hoveredTile) {
-            const x = (hoveredTile.globalX + worldView.positionX) * tileSize;
-            const y = (hoveredTile.globalY + worldView.positionY) * tileSize;
+            const x = hoveredTile.globalX * tileSize + worldView.pixelOffsetX;
+            const y = hoveredTile.globalY * tileSize + worldView.pixelOffsetY;
 
             canvasContext.lineWidth = 1;
             canvasContext.strokeStyle = "#222";
@@ -158,10 +155,10 @@ export class Game {
     private drawCircle(tile: Tile, color: string, size: number) {
         const { worldConfig, worldView, canvas } = this;
         const { canvasContext } = canvas;
-        const { tileSize, chunkSize } = worldConfig;
+        const { tileSize } = worldConfig;
 
-        const x = (tile.chunk.x * chunkSize + tile.x + worldView.positionX) * tileSize;
-        const y = (tile.chunk.y * chunkSize + tile.y + worldView.positionY) * tileSize;
+        const x = tile.globalX * tileSize + worldView.pixelOffsetX;
+        const y = tile.globalY * tileSize + worldView.pixelOffsetY;
         const halfTileSize = tileSize * 0.5;
 
         canvasContext.fillStyle = color;

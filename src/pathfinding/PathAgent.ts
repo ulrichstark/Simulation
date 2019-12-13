@@ -11,13 +11,14 @@ export class PathAgent {
     }
 
     public findPath(from: Tile, to: Tile): Tile[] | null {
-        const fromNode: PathAgentNode = {
-            tile: from,
-            parent: null,
-            score: 0
-        };
-        const openNodes = [fromNode];
-        const openedNodes = { [from.key]: true };
+        const openNodes: PathAgentNode[] = [
+            {
+                tile: from,
+                parent: null,
+                score: 0
+            }
+        ];
+        const openedNodes: { [key: string]: boolean } = { [from.key]: true };
 
         while (true) {
             const node = openNodes.shift();
