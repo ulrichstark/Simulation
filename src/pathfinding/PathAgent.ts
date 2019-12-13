@@ -4,7 +4,7 @@ import { PathAgentNode } from "./PathAgentNode";
 import { Directions } from "../common/Direction";
 
 export class PathAgent {
-    private definition: PathAgentDefinition;
+    public definition: PathAgentDefinition;
 
     constructor(definition: PathAgentDefinition) {
         this.definition = definition;
@@ -44,7 +44,7 @@ export class PathAgent {
                 const possibleOpenTile = tile.neighbors[direction.key];
 
                 if (possibleOpenTile && !openedNodes[possibleOpenTile.key]) {
-                    const cost = this.definition.getCost(tile, possibleOpenTile, direction);
+                    const cost = this.definition.getCost(tile, possibleOpenTile);
 
                     if (cost !== null) {
                         const distance = this.definition.getDistance(possibleOpenTile, to);

@@ -7,7 +7,7 @@ export interface Direction {
     diagonal: boolean;
 }
 
-export enum DirectionKey {
+export const enum DirectionKey {
     TOP = "TOP",
     TOP_RIGHT = "TOP_RIGHT",
     RIGHT = "RIGHT",

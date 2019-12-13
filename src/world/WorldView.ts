@@ -36,11 +36,22 @@ export class WorldView {
 
         const halfWidth = gameCanvas.width * 0.5;
         const halfHeight = gameCanvas.height * 0.5;
-        const halfWidthWorld = halfWidth / tileSize;
-        const halfHeightWorld = halfHeight / tileSize;
 
-        this.positionX = MathUtil.clamp(this.positionX, halfWidthWorld, chunksX * chunkSize - halfWidthWorld);
-        this.positionY = MathUtil.clamp(this.positionY, halfHeightWorld, chunksY * chunkSize - halfHeightWorld);
+        // TODO: calculation improvements
+
+        if (chunksX * chunkSize > gameCanvas.width / tileSize) {
+            const halfWidthWorld = halfWidth / tileSize;
+            this.positionX = MathUtil.clamp(this.positionX, halfWidthWorld, chunksX * chunkSize - halfWidthWorld);
+        } else {
+            this.positionX = chunksX * chunkSize * 0.5;
+        }
+
+        if (chunksY * chunkSize > gameCanvas.height / tileSize) {
+            const halfHeightWorld = halfHeight / tileSize;
+            this.positionY = MathUtil.clamp(this.positionY, halfHeightWorld, chunksY * chunkSize - halfHeightWorld);
+        } else {
+            this.positionY = chunksY * chunkSize * 0.5;
+        }
 
         this.pixelOffsetX = halfWidth - this.positionX * tileSize;
         this.pixelOffsetY = halfHeight - this.positionY * tileSize;

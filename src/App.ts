@@ -4,8 +4,8 @@ import { Game } from "./Game";
 const worldConfig: WorldConfig = {
     seed: Math.random(),
     noiseScale: 0.02,
-    chunksX: 14,
-    chunksY: 8,
+    chunksX: 4,
+    chunksY: 4,
     chunkSize: 32,
     tileSize: 8
 };

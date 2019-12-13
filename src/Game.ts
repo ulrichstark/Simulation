@@ -5,10 +5,8 @@ import { WorldRenderer } from "./world/WorldRenderer";
 import { GameInput } from "./GameInput";
 import { Actions } from "./Actions";
 import { WorldView } from "./world/WorldView";
-import { Tile } from "./world/Tile";
-import { PathAgent } from "./pathfinding/PathAgent";
-import { Stopwatch } from "./common/Stopwatch";
-import { Timer } from "./common/Timer";
+import { PathAgentDefinition } from "./pathfinding/PathAgentDefinition";
+import { Creature } from "./creature/Creature";
 
 export class Game {
     private worldConfig: WorldConfig;
@@ -20,12 +18,7 @@ export class Game {
     private input: GameInput;
 
     private targetTileHeight: number = 0;
-
-    private playerPosition: Tile;
-    private playerTarget: Tile | null = null;
-    private playerPath: Tile[] | null = null;
-    private pathAgent: PathAgent;
-    private playerMoveTimer: Timer;
+    private creatures: Creature[] = [];
 
     constructor(worldConfig: WorldConfig) {
         this.worldConfig = worldConfig;
@@ -35,12 +28,8 @@ export class Game {
         this.canvas = new GameCanvas(this.onRender.bind(this), this.onResize.bind(this));
         this.worldView = new WorldView(worldConfig, this.canvas, 0, 0);
 
-        this.playerPosition = this.world.getTileRandom();
-        this.pathAgent = new PathAgent({
-            getCost: (from, to, direction) => {
-                if (direction.diagonal) {
-                    return null;
-                }
+        const pathAgentDefinition: PathAgentDefinition = {
+            getCost: (from, to) => {
                 const cost = Math.abs(from.height - to.height);
 
                 if (cost >= 2) {
@@ -54,17 +43,11 @@ export class Game {
                 const dy = from.y - to.y;
                 return Math.abs(dx) + Math.abs(dy);
             }
-        });
+        };
 
-        this.playerMoveTimer = new Timer(100, () => {
-            if (this.playerPath && this.playerPath.length > 0) {
-                const tile = this.playerPath.shift();
-
-                if (tile) {
-                    this.playerPosition = tile;
-                }
-            }
-        });
+        for (let i = 0; i < 10; i++) {
+            this.creatures.push(new Creature(this.world, pathAgentDefinition));
+        }
     }
 
     public mount() {
@@ -99,13 +82,6 @@ export class Game {
         const { width, height, canvasContext, pointerX, pointerY, deltaTime } = canvas;
         const { tileSize } = worldConfig;
 
-        if (this.playerTarget === null || this.playerPath === null || this.playerPath.length === 0) {
-            this.playerTarget = this.world.getTileRandom();
-            this.playerPath = this.pathAgent.findPath(this.playerPosition, this.playerTarget);
-        } else {
-            this.playerMoveTimer.update(deltaTime);
-        }
-
         input.update(pointerX, pointerY, worldView);
         const { hoveredChunk, hoveredTile, isPointerDown } = input;
 
@@ -130,8 +106,16 @@ export class Game {
             hoveredChunk.invalidate();
         }
 
+        for (const creature of this.creatures) {
+            creature.update(deltaTime);
+        }
+
         canvasContext.clearRect(0, 0, width, height);
         worldRenderer.render(canvas, worldView);
+
+        for (const creature of this.creatures) {
+            creature.render(canvasContext, worldView);
+        }
 
         if (hoveredChunk && hoveredTile) {
             const x = hoveredTile.globalX * tileSize + worldView.pixelOffsetX;
@@ -141,30 +125,5 @@ export class Game {
             canvasContext.strokeStyle = "#222";
             canvasContext.strokeRect(x, y, tileSize, tileSize);
         }
-
-        if (this.playerPath) {
-            for (const tile of this.playerPath) {
-                this.drawCircle(tile, "white", 0.5);
-            }
-        }
-
-        this.drawCircle(this.playerPosition, "blue", 1);
-        this.drawCircle(this.playerTarget, "red", 1);
-    }
-
-    private drawCircle(tile: Tile, color: string, size: number) {
-        const { worldConfig, worldView, canvas } = this;
-        const { canvasContext } = canvas;
-        const { tileSize } = worldConfig;
-
-        const x = tile.globalX * tileSize + worldView.pixelOffsetX;
-        const y = tile.globalY * tileSize + worldView.pixelOffsetY;
-        const halfTileSize = tileSize * 0.5;
-
-        canvasContext.fillStyle = color;
-        canvasContext.beginPath();
-        canvasContext.arc(x + halfTileSize, y + halfTileSize, halfTileSize * size, 0, 2 * Math.PI);
-        canvasContext.closePath();
-        canvasContext.fill();
     }
 }
