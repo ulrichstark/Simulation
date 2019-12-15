@@ -1,48 +1,47 @@
 import { Factory } from "../common/Factory";
-import { WorldConfig } from "./WorldConfig";
+import { GameConfig } from "../GameConfig";
 import { Chunk } from "./Chunk";
 import { Logger } from "../common/Logger";
 import { SimplexNoise } from "../common/SimplexNoise";
 import { Directions } from "../common/Direction";
+import { RandomGenerator } from "../common/RandomGenerator";
+import { TileMountMethod, Tile } from "./Tile";
 
 const logger = new Logger("World");
 
 export class World {
-    private noise: SimplexNoise;
-
-    public width: number;
-    public height: number;
-    public config: WorldConfig;
     public chunks: Chunk[][];
+    public tiles: { [key: string]: Tile } = {};
 
-    constructor(config: WorldConfig) {
-        this.config = config;
+    constructor() {
+        const { seed, chunksXInWorld, chunksYInWorld, tilesXInWorld, tilesYInWorld, tilesInChunk, noiseScale } = GameConfig;
 
-        const { chunksX, chunksY, chunkSize, seed } = config;
+        const noise = new SimplexNoise(seed);
 
-        this.width = chunksX * chunkSize;
-        this.height = chunksY * chunkSize;
-        this.noise = new SimplexNoise(seed);
+        const tileMountMethod: TileMountMethod = (tile: Tile) => {
+            const nx = tile.globalY * noiseScale;
+            const ny = tile.globalX * noiseScale;
+            const noiseValue = noise.calculate(nx, ny);
+            tile.height = Math.floor(noiseValue * 10);
+            this.tiles[tile.key] = tile;
+        };
 
-        this.chunks = Factory.createTwoDimensionalArray(chunksX, chunksY, this.createChunk.bind(this));
+        this.chunks = Factory.createTwoDimensionalArray(chunksXInWorld, chunksYInWorld, (x, y) => new Chunk(x, y, tileMountMethod));
 
-        logger.log(`Created with ${this.width}x${this.height} tiles!`);
+        logger.log(`Created with ${tilesXInWorld}x${tilesYInWorld} tiles!`);
 
-        for (let cx = 0; cx < chunksX; cx++) {
-            for (let cy = 0; cy < chunksY; cy++) {
-                const chunk = this.chunks[cx][cy];
-                const chunkX = cx * chunkSize;
-                const chunkY = cy * chunkSize;
+        for (let cx = 0; cx < chunksXInWorld; cx++) {
+            for (let cy = 0; cy < chunksYInWorld; cy++) {
+                const { tiles } = this.chunks[cx][cy];
 
-                for (let tx = 0; tx < chunkSize; tx++) {
-                    for (let ty = 0; ty < chunkSize; ty++) {
-                        const tile = chunk.tiles[tx][ty];
-                        const tileX = chunkX + tx;
-                        const tileY = chunkY + ty;
+                for (let tx = 0; tx < tilesInChunk; tx++) {
+                    for (let ty = 0; ty < tilesInChunk; ty++) {
+                        const tile = tiles[tx][ty];
+                        const { globalX, globalY } = tile;
 
                         for (const vector of Directions) {
-                            const x = tileX + vector.x;
-                            const y = tileY + vector.y;
+                            const x = globalX + vector.x;
+                            const y = globalY + vector.y;
 
                             tile.neighbors[vector.key] = this.getTile(x, y);
                         }
@@ -51,39 +50,17 @@ export class World {
             }
         }
 
-        logger.log("Linked!");
-    }
-
-    private createChunk(x: number, y: number): Chunk {
-        const { config, noise } = this;
-        const { chunkSize, noiseScale } = config;
-
-        const offsetX = x * chunkSize;
-        const offsetY = y * chunkSize;
-
-        return new Chunk(x, y, this.config, (tx, ty) => {
-            const nx = (tx + offsetX) * noiseScale;
-            const ny = (ty + offsetY) * noiseScale;
-            const noiseValue = noise.calculate(nx, ny);
-            return Math.floor(noiseValue * 10);
-        });
+        logger.logObject("Linked!", this.chunks);
     }
 
     public getTile(x: number, y: number) {
-        if (x < 0 || y < 0 || x >= this.width || y >= this.height) {
-            return null;
-        } else {
-            const { chunkSize } = this.config;
-            const chunk = this.chunks[Math.floor(x / chunkSize)][Math.floor(y / chunkSize)];
-            return chunk.tiles[x % chunkSize][y % chunkSize];
-        }
+        return this.tiles[Factory.createTileKey(x, y)];
     }
 
     public getTileRandom() {
-        const x = Math.floor(Math.random() * this.width);
-        const y = Math.floor(Math.random() * this.height);
-        const { chunkSize } = this.config;
-        const chunk = this.chunks[Math.floor(x / chunkSize)][Math.floor(y / chunkSize)];
-        return chunk.tiles[x % chunkSize][y % chunkSize];
+        const { tilesXInWorld, tilesYInWorld } = GameConfig;
+        const x = RandomGenerator.get0N(tilesXInWorld);
+        const y = RandomGenerator.get0N(tilesYInWorld);
+        return this.getTile(x, y);
     }
 }

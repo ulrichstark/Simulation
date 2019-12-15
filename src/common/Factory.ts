@@ -24,4 +24,8 @@ export class Factory {
             [DirectionKey.TOP_LEFT]: defaultValue
         };
     }
+
+    public static createTileKey(x: number, y: number) {
+        return `${x}_${y}`;
+    }
 }

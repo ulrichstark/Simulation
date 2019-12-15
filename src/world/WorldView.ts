@@ -1,9 +1,8 @@
-import { WorldConfig } from "./WorldConfig";
+import { GameConfig } from "../GameConfig";
 import { GameCanvas } from "../GameCanvas";
 import { MathUtil } from "../common/MathUtil";
 
 export class WorldView {
-    private worldConfig: WorldConfig;
     private gameCanvas: GameCanvas;
 
     public positionX: number;
@@ -11,8 +10,7 @@ export class WorldView {
     public pixelOffsetX: number;
     public pixelOffsetY: number;
 
-    constructor(worldConfig: WorldConfig, gameCanvas: GameCanvas, positionX: number, positionY: number) {
-        this.worldConfig = worldConfig;
+    constructor(gameCanvas: GameCanvas, positionX: number, positionY: number) {
         this.gameCanvas = gameCanvas;
         this.positionX = positionX;
         this.positionY = positionY;
@@ -31,29 +29,27 @@ export class WorldView {
     }
 
     public update() {
-        const { worldConfig, gameCanvas } = this;
-        const { tileSize, chunksX, chunksY, chunkSize } = worldConfig;
+        const { width, height } = this.gameCanvas;
+        const { pixelsInTile, tilesXInWorld, tilesYInWorld } = GameConfig;
 
-        const halfWidth = gameCanvas.width * 0.5;
-        const halfHeight = gameCanvas.height * 0.5;
+        const halfWidth = width * 0.5;
+        const halfHeight = height * 0.5;
 
-        // TODO: calculation improvements
-
-        if (chunksX * chunkSize > gameCanvas.width / tileSize) {
-            const halfWidthWorld = halfWidth / tileSize;
-            this.positionX = MathUtil.clamp(this.positionX, halfWidthWorld, chunksX * chunkSize - halfWidthWorld);
+        if (tilesXInWorld > width / pixelsInTile) {
+            const halfWidthWorld = halfWidth / pixelsInTile;
+            this.positionX = MathUtil.clamp(this.positionX, halfWidthWorld, tilesYInWorld - halfWidthWorld);
         } else {
-            this.positionX = chunksX * chunkSize * 0.5;
+            this.positionX = tilesXInWorld * 0.5;
         }
 
-        if (chunksY * chunkSize > gameCanvas.height / tileSize) {
-            const halfHeightWorld = halfHeight / tileSize;
-            this.positionY = MathUtil.clamp(this.positionY, halfHeightWorld, chunksY * chunkSize - halfHeightWorld);
+        if (tilesYInWorld > height / pixelsInTile) {
+            const halfHeightWorld = halfHeight / pixelsInTile;
+            this.positionY = MathUtil.clamp(this.positionY, halfHeightWorld, tilesYInWorld - halfHeightWorld);
         } else {
-            this.positionY = chunksY * chunkSize * 0.5;
+            this.positionY = tilesYInWorld * 0.5;
         }
 
-        this.pixelOffsetX = halfWidth - this.positionX * tileSize;
-        this.pixelOffsetY = halfHeight - this.positionY * tileSize;
+        this.pixelOffsetX = halfWidth - this.positionX * pixelsInTile;
+        this.pixelOffsetY = halfHeight - this.positionY * pixelsInTile;
     }
 }

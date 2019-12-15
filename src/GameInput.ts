@@ -3,6 +3,7 @@ import { Tile } from "./world/Tile";
 import { World } from "./world/World";
 import { Actions, ActionCameraMove } from "./Actions";
 import { WorldView } from "./world/WorldView";
+import { GameConfig } from "./GameConfig";
 
 type ActionCallback = (action: Actions) => void;
 
@@ -36,17 +37,17 @@ export class GameInput {
     }
 
     public update(pointerXPixel: number, pointerYPixel: number, worldView: WorldView) {
-        const { chunks, config } = this.world;
-        const { tileSize, chunkSize } = config;
+        const { chunks } = this.world;
+        const { pixelsInTile, tilesInChunk } = GameConfig;
         const { pixelOffsetX, pixelOffsetY } = worldView;
 
-        this.pointerX = (pointerXPixel - pixelOffsetX) / tileSize;
-        this.pointerY = (pointerYPixel - pixelOffsetY) / tileSize;
+        this.pointerX = (pointerXPixel - pixelOffsetX) / pixelsInTile;
+        this.pointerY = (pointerYPixel - pixelOffsetY) / pixelsInTile;
 
-        const chunkX = Math.floor(this.pointerX / chunkSize);
-        const chunkY = Math.floor(this.pointerY / chunkSize);
-        const tileX = Math.floor(this.pointerX % chunkSize);
-        const tileY = Math.floor(this.pointerY % chunkSize);
+        const chunkX = Math.floor(this.pointerX / tilesInChunk);
+        const chunkY = Math.floor(this.pointerY / tilesInChunk);
+        const tileX = Math.floor(this.pointerX % tilesInChunk);
+        const tileY = Math.floor(this.pointerY % tilesInChunk);
 
         if (chunks[chunkX] && chunks[chunkX][chunkY]) {
             const chunk = chunks[chunkX][chunkY];

@@ -1,6 +1,6 @@
 import { GameCanvas } from "./GameCanvas";
 import { World } from "./world/World";
-import { WorldConfig } from "./world/WorldConfig";
+import { GameConfig } from "./GameConfig";
 import { WorldRenderer } from "./world/WorldRenderer";
 import { GameInput } from "./GameInput";
 import { Actions } from "./Actions";
@@ -9,7 +9,6 @@ import { PathAgentDefinition } from "./pathfinding/PathAgentDefinition";
 import { Creature } from "./creature/Creature";
 
 export class Game {
-    private worldConfig: WorldConfig;
     private world: World;
     private worldRenderer: WorldRenderer;
     private worldView: WorldView;
@@ -20,13 +19,12 @@ export class Game {
     private targetTileHeight: number = 0;
     private creatures: Creature[] = [];
 
-    constructor(worldConfig: WorldConfig) {
-        this.worldConfig = worldConfig;
-        this.world = new World(worldConfig);
+    constructor() {
+        this.world = new World();
         this.worldRenderer = new WorldRenderer(this.world);
         this.input = new GameInput(this.world, this.onAction.bind(this));
         this.canvas = new GameCanvas(this.onRender.bind(this), this.onResize.bind(this));
-        this.worldView = new WorldView(worldConfig, this.canvas, 0, 0);
+        this.worldView = new WorldView(this.canvas, 0, 0);
 
         const pathAgentDefinition: PathAgentDefinition = {
             getCost: (from, to) => {
@@ -39,8 +37,8 @@ export class Game {
                 }
             },
             getDistance: (from, to) => {
-                const dx = from.x - to.x;
-                const dy = from.y - to.y;
+                const dx = from.localX - to.localX;
+                const dy = from.localY - to.localY;
                 return Math.abs(dx) + Math.abs(dy);
             }
         };
@@ -78,52 +76,48 @@ export class Game {
     }
 
     private onRender() {
-        const { worldConfig, worldRenderer, worldView, canvas, input } = this;
+        const { worldRenderer, worldView, canvas, input, creatures, targetTileHeight } = this;
         const { width, height, canvasContext, pointerX, pointerY, deltaTime } = canvas;
-        const { tileSize } = worldConfig;
+        const { pixelsInTile } = GameConfig;
 
         input.update(pointerX, pointerY, worldView);
         const { hoveredChunk, hoveredTile, isPointerDown } = input;
 
         if (isPointerDown && hoveredChunk && hoveredTile) {
-            hoveredTile.height = this.targetTileHeight;
-            if (hoveredTile.neighbors.TOP) {
-                hoveredTile.neighbors.TOP.height = this.targetTileHeight;
-                hoveredTile.neighbors.TOP.chunk.invalidate();
+            hoveredTile.setHeight(targetTileHeight);
+            const { neighbors } = hoveredTile;
+            if (neighbors.TOP) {
+                neighbors.TOP.setHeight(targetTileHeight);
             }
-            if (hoveredTile.neighbors.BOTTOM) {
-                hoveredTile.neighbors.BOTTOM.height = this.targetTileHeight;
-                hoveredTile.neighbors.BOTTOM.chunk.invalidate();
+            if (neighbors.BOTTOM) {
+                neighbors.BOTTOM.setHeight(targetTileHeight);
             }
-            if (hoveredTile.neighbors.LEFT) {
-                hoveredTile.neighbors.LEFT.height = this.targetTileHeight;
-                hoveredTile.neighbors.LEFT.chunk.invalidate();
+            if (neighbors.LEFT) {
+                neighbors.LEFT.setHeight(targetTileHeight);
             }
-            if (hoveredTile.neighbors.RIGHT) {
-                hoveredTile.neighbors.RIGHT.height = this.targetTileHeight;
-                hoveredTile.neighbors.RIGHT.chunk.invalidate();
+            if (neighbors.RIGHT) {
+                neighbors.RIGHT.setHeight(targetTileHeight);
             }
-            hoveredChunk.invalidate();
         }
 
-        for (const creature of this.creatures) {
+        for (const creature of creatures) {
             creature.update(deltaTime);
         }
 
         canvasContext.clearRect(0, 0, width, height);
         worldRenderer.render(canvas, worldView);
 
-        for (const creature of this.creatures) {
+        for (const creature of creatures) {
             creature.render(canvasContext, worldView);
         }
 
-        if (hoveredChunk && hoveredTile) {
-            const x = hoveredTile.globalX * tileSize + worldView.pixelOffsetX;
-            const y = hoveredTile.globalY * tileSize + worldView.pixelOffsetY;
+        if (hoveredTile) {
+            const x = hoveredTile.globalPixelX + worldView.pixelOffsetX;
+            const y = hoveredTile.globalPixelY + worldView.pixelOffsetY;
 
             canvasContext.lineWidth = 1;
             canvasContext.strokeStyle = "#222";
-            canvasContext.strokeRect(x, y, tileSize, tileSize);
+            canvasContext.strokeRect(x, y, pixelsInTile, pixelsInTile);
         }
     }
 }

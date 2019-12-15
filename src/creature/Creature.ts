@@ -4,7 +4,7 @@ import { PathAgent } from "../pathfinding/PathAgent";
 import { PathAgentDefinition } from "../pathfinding/PathAgentDefinition";
 import { Timer } from "../common/Timer";
 import { WorldView } from "../world/WorldView";
-import { Directions } from "../common/Direction";
+import { GameConfig } from "../GameConfig";
 
 export class Creature {
     private world: World;
@@ -65,11 +65,11 @@ export class Creature {
     }
 
     private drawCircle(canvasContext: CanvasRenderingContext2D, worldView: WorldView, tile: Tile, color: string, size: number) {
-        const { tileSize } = this.world.config;
+        const { pixelsInTile } = GameConfig;
 
-        const x = tile.globalX * tileSize + worldView.pixelOffsetX;
-        const y = tile.globalY * tileSize + worldView.pixelOffsetY;
-        const halfTileSize = tileSize * 0.5;
+        const x = tile.globalX * pixelsInTile + worldView.pixelOffsetX;
+        const y = tile.globalY * pixelsInTile + worldView.pixelOffsetY;
+        const halfTileSize = pixelsInTile * 0.5;
 
         canvasContext.fillStyle = color;
         canvasContext.beginPath();

@@ -1,14 +1,8 @@
-import { WorldConfig } from "./world/WorldConfig";
 import { Game } from "./Game";
+import { RandomGenerator } from "./common/RandomGenerator";
+import { GameConfig } from "./GameConfig";
 
-const worldConfig: WorldConfig = {
-    seed: Math.random(),
-    noiseScale: 0.02,
-    chunksX: 4,
-    chunksY: 4,
-    chunkSize: 32,
-    tileSize: 8
-};
+RandomGenerator.seed = GameConfig.seed;
 
-const game = new Game(worldConfig);
+const game = new Game();
 game.mount();

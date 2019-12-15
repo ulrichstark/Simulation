@@ -8,4 +8,8 @@ export class Logger {
     public log(text: string) {
         console.log(`${this.name}: ${text}`);
     }
+
+    public logObject(text: string, object: any) {
+        console.log(`${this.name}: ${text}`, object);
+    }
 }
