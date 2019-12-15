@@ -19,7 +19,7 @@ export class Tile {
     public globalPixelY: number;
 
     public height: number;
-    public neighbors: DirectionMap<Tile | null>;
+    public neighbors: DirectionMap<Tile | undefined>;
 
     constructor(localX: number, localY: number, chunk: Chunk, tileMountMethod: TileMountMethod) {
         const { pixelsInTile } = GameConfig;
@@ -35,7 +35,7 @@ export class Tile {
         this.globalPixelX = pixelX + this.localPixelX;
         this.globalPixelY = pixelY + this.localPixelY;
         this.key = Factory.createTileKey(this.globalX, this.globalY);
-        this.neighbors = Factory.createDirectionMap(null);
+        this.neighbors = Factory.createDirectionMap(undefined);
 
         tileMountMethod(this);
     }
@@ -60,5 +60,21 @@ export class Tile {
         if (neighbors.TOP_RIGHT) {
             neighbors.TOP_RIGHT.chunk.invalidate();
         }
+    }
+
+    public isDiagonalTo(tile: Tile) {
+        return this.globalX !== tile.globalX && this.globalY !== tile.globalY;
+    }
+
+    public getDistanceTo(tile: Tile) {
+        const dx = this.globalX - tile.globalX;
+        const dy = this.globalY - tile.globalY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public getPositionDifferenceTo(tile: Tile) {
+        const dx = this.globalX - tile.globalX;
+        const dy = this.globalY - tile.globalY;
+        return Math.abs(dx) + Math.abs(dy);
     }
 }

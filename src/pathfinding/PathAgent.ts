@@ -11,6 +11,7 @@ export class PathAgent {
     }
 
     public findPath(from: Tile, to: Tile): Tile[] | null {
+        const { getCost, getDistance } = this.definition;
         const openNodes: PathAgentNode[] = [
             {
                 tile: from,
@@ -44,10 +45,10 @@ export class PathAgent {
                 const possibleOpenTile = tile.neighbors[direction.key];
 
                 if (possibleOpenTile && !openedNodes[possibleOpenTile.key]) {
-                    const cost = this.definition.getCost(tile, possibleOpenTile);
+                    const cost = getCost(tile, possibleOpenTile);
 
                     if (cost !== null) {
-                        const distance = this.definition.getDistance(possibleOpenTile, to);
+                        const distance = getDistance(possibleOpenTile, to);
                         const score = node.score + cost + distance;
 
                         const nextNode: PathAgentNode = {
@@ -61,7 +62,7 @@ export class PathAgent {
                         // TODO: Pathfinding optimization possible
                         let inserted = false;
                         for (let i = 0; i < openNodes.length; i++) {
-                            if (openNodes[i].score >= score) {
+                            if (openNodes[i].score > score) {
                                 openNodes.splice(i, 0, nextNode);
                                 inserted = true;
                                 break;

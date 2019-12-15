@@ -12,7 +12,7 @@ export class Factory {
         return array;
     }
 
-    public static createDirectionMap<T>(defaultValue: T): DirectionMap<T> {
+    public static createDirectionMap(defaultValue: any): DirectionMap<any> {
         return {
             [DirectionKey.TOP]: defaultValue,
             [DirectionKey.TOP_RIGHT]: defaultValue,
