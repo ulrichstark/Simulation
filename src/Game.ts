@@ -28,24 +28,21 @@ export class Game {
 
         const pathAgentDefinition: PathAgentDefinition = {
             getCost: (from, to) => {
-                if (from.isDiagonalTo(to)) {
-                    return null;
-                }
                 const heightDifference = Math.abs(from.height - to.height);
 
                 if (heightDifference >= 2) {
                     return null;
                 } else {
-                    const cost = 1 + heightDifference;
+                    const cost = heightDifference;
                     if (from.isDiagonalTo(to)) {
-                        return cost * Math.SQRT2;
+                        return cost + 1;
                     } else {
                         return cost;
                     }
                 }
             },
             getDistance: (from, to) => {
-                return from.getPositionDifferenceTo(to);
+                return from.getDistanceTo(to);
             }
         };
 

@@ -1,12 +1,15 @@
+import { RandomGenerator } from "./RandomGenerator";
+
 export type TimerAction = () => void;
 
 export class Timer {
     private interval: number;
-    private time: number = 0;
+    private time: number;
     private action: TimerAction;
 
     constructor(interval: number, action: TimerAction) {
         this.interval = interval;
+        this.time = RandomGenerator.get0N(interval);
         this.action = action;
     }
 
