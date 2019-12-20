@@ -15,6 +15,7 @@ export class GameInput {
     private keyDownMap: boolean[] = [];
     private keyActionMap: KeyAction[] = [];
 
+    // TODO: no need for hovered chunk
     public hoveredChunk: Chunk | null = null;
     public hoveredTile: Tile | null = null;
     public isPointerDown: boolean = false;

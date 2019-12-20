@@ -58,9 +58,9 @@ export class Creature {
             }
         }
 
-        this.drawCircle(canvasContext, worldView, this.position, "blue", 1);
+        this.drawCircle(canvasContext, worldView, this.position, "yellow", 1);
         if (this.target !== null) {
-            this.drawCircle(canvasContext, worldView, this.target, "red", 1);
+            this.drawCircle(canvasContext, worldView, this.target, "red", 0.5);
         }
     }
 

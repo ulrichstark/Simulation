@@ -2,6 +2,8 @@ import { Chunk } from "./Chunk";
 import { DirectionMap } from "../common/Direction";
 import { Factory } from "../common/Factory";
 import { GameConfig } from "../GameConfig";
+import { RandomGenerator } from "../common/RandomGenerator";
+import { TileWater } from "./TileWater";
 
 export type TileMountMethod = (tile: Tile) => void;
 
@@ -19,6 +21,7 @@ export class Tile {
     public globalPixelY: number;
 
     public height: number;
+    public water: TileWater;
     public neighbors: DirectionMap<Tile | undefined>;
 
     constructor(localX: number, localY: number, chunk: Chunk, tileMountMethod: TileMountMethod) {
@@ -36,6 +39,7 @@ export class Tile {
         this.globalPixelY = pixelY + this.localPixelY;
         this.key = Factory.createTileKey(this.globalX, this.globalY);
         this.neighbors = Factory.createDirectionMap(undefined);
+        this.water = new TileWater(this, RandomGenerator.get01());
 
         tileMountMethod(this);
     }
@@ -76,5 +80,9 @@ export class Tile {
         const dx = this.globalX - tile.globalX;
         const dy = this.globalY - tile.globalY;
         return Math.abs(dx) + Math.abs(dy);
+    }
+
+    public getTotalHeight() {
+        return this.height + this.water.waterLevel;
     }
 }

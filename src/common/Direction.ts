@@ -1,10 +1,17 @@
+import { Vector } from "./Vector";
+
 export type DirectionMap<T> = Record<DirectionKey, T>;
 
-export interface Direction {
-    x: number;
-    y: number;
-    key: DirectionKey;
-    diagonal: boolean;
+export class Direction extends Vector {
+    public key: DirectionKey;
+    public diagonal: boolean;
+    public factor: number = 0;
+
+    constructor(x: number, y: number, key: DirectionKey) {
+        super(x, y);
+        this.key = key;
+        this.diagonal = x !== 0 && y !== 0;
+    }
 }
 
 export const enum DirectionKey {
@@ -19,12 +26,32 @@ export const enum DirectionKey {
 }
 
 export const Directions: Direction[] = [
-    { x: 0, y: -1, key: DirectionKey.TOP, diagonal: false },
-    { x: 1, y: -1, key: DirectionKey.TOP_RIGHT, diagonal: true },
-    { x: 1, y: 0, key: DirectionKey.RIGHT, diagonal: false },
-    { x: 1, y: 1, key: DirectionKey.BOTTOM_RIGHT, diagonal: true },
-    { x: 0, y: 1, key: DirectionKey.BOTTOM, diagonal: false },
-    { x: -1, y: 1, key: DirectionKey.BOTTOM_LEFT, diagonal: true },
-    { x: -1, y: 0, key: DirectionKey.LEFT, diagonal: false },
-    { x: -1, y: -1, key: DirectionKey.TOP_LEFT, diagonal: true }
+    new Direction(0, -1, DirectionKey.TOP),
+    new Direction(1, -1, DirectionKey.TOP_RIGHT),
+    new Direction(1, 0, DirectionKey.RIGHT),
+    new Direction(1, 1, DirectionKey.BOTTOM_RIGHT),
+    new Direction(0, 1, DirectionKey.BOTTOM),
+    new Direction(-1, 1, DirectionKey.BOTTOM_LEFT),
+    new Direction(-1, 0, DirectionKey.LEFT),
+    new Direction(-1, -1, DirectionKey.TOP_LEFT)
 ];
+
+export const DirectionsDirect: Direction[] = Directions.filter(direction => !direction.diagonal);
+
+export function applyVectorToDirections(vector: Vector) {
+    const { x, y } = vector;
+    if (x === 0 && y === 0) {
+        for (const direction of DirectionsDirect) {
+            direction.factor = 0;
+        }
+        return false;
+    } else {
+        const vectorLength = Math.sqrt(x * x + y * y);
+        for (const direction of DirectionsDirect) {
+            const scalarProduct = direction.x * x + direction.y * y;
+            const factor = 1 - Math.acos(scalarProduct / vectorLength) / Math.PI;
+            direction.factor = factor * factor;
+        }
+        return true;
+    }
+}

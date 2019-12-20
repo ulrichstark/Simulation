@@ -58,12 +58,12 @@ export class Chunk {
                 } else {
                     if (tile.neighbors.BOTTOM_LEFT && tile.height > tile.neighbors.BOTTOM_LEFT.height) {
                         canvasContext.fillStyle = `rgb(17, ${110 + tile.neighbors.BOTTOM_LEFT.height * 10}, 17)`;
-                        canvasContext.fillRect(x, y + pixelsInTile * 0.8, pixelsInTile * 0.2, pixelsInTile * 0.2);
+                        canvasContext.fillRect(x, y + pixelsInTile * 0.6, pixelsInTile * 0.2, pixelsInTile * 0.4);
                     }
 
                     if (tile.neighbors.BOTTOM_RIGHT && tile.height > tile.neighbors.BOTTOM_RIGHT.height) {
                         canvasContext.fillStyle = `rgb(17, ${110 + tile.neighbors.BOTTOM_RIGHT.height * 10}, 17)`;
-                        canvasContext.fillRect(x + pixelsInTile * 0.8, y + pixelsInTile * 0.8, pixelsInTile * 0.2, pixelsInTile * 0.2);
+                        canvasContext.fillRect(x + pixelsInTile * 0.8, y + pixelsInTile * 0.6, pixelsInTile * 0.2, pixelsInTile * 0.4);
                     }
                 }
             }

@@ -1,5 +1,5 @@
 export class GameConfig {
-    public static readonly seed = 6;
+    public static readonly seed = Math.random() * 10000;
     public static readonly noiseScale = 0.02;
     public static readonly chunksXInWorld = 4;
     public static readonly chunksYInWorld = 4;

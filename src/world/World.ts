@@ -53,6 +53,21 @@ export class World {
         logger.logObject("Linked!", this.chunks);
     }
 
+    public update() {
+        const { tiles } = this;
+
+        for (const key in tiles) {
+            tiles[key].water.update();
+        }
+
+        let totalWater = 0;
+        for (const key in tiles) {
+            tiles[key].water.applyCache();
+            totalWater += tiles[key].water.waterLevel;
+        }
+        // console.log(totalWater);
+    }
+
     public getTile(x: number, y: number) {
         return this.tiles[Factory.createTileKey(x, y)];
     }

@@ -28,6 +28,9 @@ export class Game {
 
         const pathAgentDefinition: PathAgentDefinition = {
             getCost: (from, to) => {
+                if (to.water.waterLevel > 1) {
+                    return null;
+                }
                 const heightDifference = Math.abs(from.height - to.height);
 
                 if (heightDifference >= 2) {
@@ -79,7 +82,7 @@ export class Game {
     }
 
     private onRender() {
-        const { worldRenderer, worldView, canvas, input, creatures, targetTileHeight } = this;
+        const { world, worldRenderer, worldView, canvas, input, creatures, targetTileHeight } = this;
         const { width, height, canvasContext, pointerX, pointerY, deltaTime } = canvas;
         const { pixelsInTile } = GameConfig;
 
@@ -88,6 +91,7 @@ export class Game {
 
         if (isPointerDown && hoveredChunk && hoveredTile) {
             hoveredTile.setHeight(targetTileHeight);
+            hoveredTile.water.addWater(deltaTime * 0.01);
             const { neighbors } = hoveredTile;
             if (neighbors.TOP) {
                 neighbors.TOP.setHeight(targetTileHeight);
@@ -102,6 +106,8 @@ export class Game {
                 neighbors.RIGHT.setHeight(targetTileHeight);
             }
         }
+
+        world.update();
 
         for (const creature of creatures) {
             creature.update(deltaTime);
