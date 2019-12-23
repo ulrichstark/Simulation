@@ -28,7 +28,7 @@ export class World {
 
         this.chunks = Factory.createTwoDimensionalArray(chunksXInWorld, chunksYInWorld, (x, y) => new Chunk(x, y, tileMountMethod));
 
-        logger.log(`Created with ${tilesXInWorld}x${tilesYInWorld} tiles!`);
+        logger.log(`Created with ${tilesXInWorld}x${tilesYInWorld} = ${tilesXInWorld * tilesYInWorld} tiles!`);
 
         for (let cx = 0; cx < chunksXInWorld; cx++) {
             for (let cy = 0; cy < chunksYInWorld; cy++) {
@@ -53,29 +53,26 @@ export class World {
         logger.logObject("Linked!", this.chunks);
     }
 
-    public update() {
+    public update(deltaTime: number) {
         const { tiles } = this;
 
         for (const key in tiles) {
-            tiles[key].water.update();
+            tiles[key].update(deltaTime);
         }
 
-        let totalWater = 0;
         for (const key in tiles) {
-            tiles[key].water.applyCache();
-            totalWater += tiles[key].water.waterLevel;
+            tiles[key].applyWaterLevelDelta();
         }
-        // console.log(totalWater);
     }
 
-    public getTile(x: number, y: number) {
+    public getTile(x: number, y: number): Tile | undefined {
         return this.tiles[Factory.createTileKey(x, y)];
     }
 
-    public getTileRandom() {
+    public getTileRandom(): Tile {
         const { tilesXInWorld, tilesYInWorld } = GameConfig;
         const x = RandomGenerator.get0N(tilesXInWorld);
         const y = RandomGenerator.get0N(tilesYInWorld);
-        return this.getTile(x, y);
+        return this.tiles[Factory.createTileKey(x, y)];
     }
 }

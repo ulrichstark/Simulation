@@ -28,7 +28,7 @@ export class Game {
 
         const pathAgentDefinition: PathAgentDefinition = {
             getCost: (from, to) => {
-                if (to.water.waterLevel > 1) {
+                if (to.waterLevel > 1) {
                     return null;
                 }
                 const heightDifference = Math.abs(from.height - to.height);
@@ -67,8 +67,9 @@ export class Game {
     private onAction(action: Actions) {
         switch (action.key) {
             case "CAMERA_MOVE": {
+                const speed = GameConfig.cameraMovementSpeed * this.canvas.deltaTime;
                 const { deltaX, deltaY } = action;
-                this.worldView.move(deltaX, deltaY);
+                this.worldView.move(deltaX * speed, deltaY * speed);
                 break;
             }
             case "TILE_CLICK": {
@@ -87,11 +88,10 @@ export class Game {
         const { pixelsInTile } = GameConfig;
 
         input.update(pointerX, pointerY, worldView);
-        const { hoveredChunk, hoveredTile, isPointerDown } = input;
+        const { hoveredTile, isPointerDown } = input;
 
-        if (isPointerDown && hoveredChunk && hoveredTile) {
+        if (isPointerDown && hoveredTile) {
             hoveredTile.setHeight(targetTileHeight);
-            hoveredTile.water.addWater(deltaTime * 0.01);
             const { neighbors } = hoveredTile;
             if (neighbors.TOP) {
                 neighbors.TOP.setHeight(targetTileHeight);
@@ -107,7 +107,11 @@ export class Game {
             }
         }
 
-        world.update();
+        if (hoveredTile) {
+            console.log(hoveredTile.waterLevel);
+        }
+
+        world.update(deltaTime);
 
         for (const creature of creatures) {
             creature.update(deltaTime);

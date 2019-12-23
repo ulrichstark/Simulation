@@ -1,7 +1,7 @@
+import { GameConfig } from "./GameConfig";
+
 type FrameMethod = () => void;
 type ResizeMethod = () => void;
-
-const maxDeltaTime = 200;
 
 export class GameCanvas {
     private canvasElement: HTMLCanvasElement;
@@ -50,7 +50,7 @@ export class GameCanvas {
         this.scheduleFrame();
 
         if (this.lastTime !== null) {
-            this.deltaTime = Math.min(maxDeltaTime, time - this.lastTime);
+            this.deltaTime = Math.min(0.1, (time - this.lastTime) * 0.001);
         }
         this.lastTime = time;
 

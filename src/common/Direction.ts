@@ -38,8 +38,7 @@ export const Directions: Direction[] = [
 
 export const DirectionsDirect: Direction[] = Directions.filter(direction => !direction.diagonal);
 
-export function applyVectorToDirections(vector: Vector) {
-    const { x, y } = vector;
+export function applyVectorToDirections(x: number, y: number) {
     if (x === 0 && y === 0) {
         for (const direction of DirectionsDirect) {
             direction.factor = 0;

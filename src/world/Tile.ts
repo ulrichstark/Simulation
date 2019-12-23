@@ -1,9 +1,8 @@
 import { Chunk } from "./Chunk";
-import { DirectionMap } from "../common/Direction";
+import { DirectionMap, Directions } from "../common/Direction";
 import { Factory } from "../common/Factory";
 import { GameConfig } from "../GameConfig";
 import { RandomGenerator } from "../common/RandomGenerator";
-import { TileWater } from "./TileWater";
 
 export type TileMountMethod = (tile: Tile) => void;
 
@@ -20,8 +19,27 @@ export class Tile {
     public globalPixelX: number;
     public globalPixelY: number;
 
-    public height: number;
-    public water: TileWater;
+    private _height: number;
+    public get height() {
+        return this._height;
+    }
+    public set height(value: number) {
+        this._height = value;
+        this.heightCombined = value + this._waterLevel;
+    }
+
+    private _waterLevel: number;
+    public get waterLevel() {
+        return this._waterLevel;
+    }
+    public set waterLevel(value: number) {
+        this._waterLevel = value;
+        this.heightCombined = value + this._height;
+    }
+
+    public heightCombined: number;
+    public waterLevelDelta: number;
+    public waterFlowTarget: Tile | null;
     public neighbors: DirectionMap<Tile | undefined>;
 
     constructor(localX: number, localY: number, chunk: Chunk, tileMountMethod: TileMountMethod) {
@@ -39,9 +57,64 @@ export class Tile {
         this.globalPixelY = pixelY + this.localPixelY;
         this.key = Factory.createTileKey(this.globalX, this.globalY);
         this.neighbors = Factory.createDirectionMap(undefined);
-        this.water = new TileWater(this, RandomGenerator.get01());
+        this.waterLevel = RandomGenerator.get01();
+        this.waterLevelDelta = 0;
+        this.waterFlowTarget = null;
 
         tileMountMethod(this);
+    }
+
+    public update(deltaTime: number) {
+        const { minimalHeightDiffForWaterFlow, waterFlowSpeed } = GameConfig;
+        const { neighbors, heightCombined, waterLevel } = this;
+        const heightDiff = waterLevel < minimalHeightDiffForWaterFlow ? 0 : minimalHeightDiffForWaterFlow;
+
+        if (this.waterFlowTarget !== null) {
+            if (heightCombined - this.waterFlowTarget.heightCombined < heightDiff) {
+                this.waterFlowTarget = null;
+            }
+        }
+
+        if (this.waterFlowTarget === null) {
+            let lowestNeighbor = null;
+            let lowestHeight = heightCombined;
+
+            for (const direction of Directions) {
+                const neighbor = neighbors[direction.key];
+
+                if (neighbor) {
+                    const neighborTotalHeight = neighbor.heightCombined;
+
+                    if (neighborTotalHeight <= heightCombined) {
+                        if (heightCombined - neighborTotalHeight >= heightDiff && neighborTotalHeight < lowestHeight) {
+                            lowestHeight = neighborTotalHeight;
+                            lowestNeighbor = neighbor;
+                        }
+
+                        const { waterFlowTarget } = neighbor;
+                        if (waterFlowTarget) {
+                            const flowTargetTotalHeight = waterFlowTarget.heightCombined;
+
+                            if (heightCombined - flowTargetTotalHeight >= heightDiff && flowTargetTotalHeight < lowestHeight) {
+                                lowestHeight = flowTargetTotalHeight;
+                                lowestNeighbor = neighbor;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (lowestNeighbor !== null) {
+                this.waterFlowTarget = lowestNeighbor;
+            }
+        }
+
+        if (this.waterFlowTarget !== null) {
+            const movingWater = Math.min(waterLevel, deltaTime * waterFlowSpeed);
+
+            this.waterFlowTarget.waterLevelDelta += movingWater;
+            this.waterLevelDelta -= movingWater;
+        }
     }
 
     public setHeight(newHeight: number) {
@@ -49,6 +122,7 @@ export class Tile {
         const { chunk, neighbors } = this;
 
         chunk.invalidate();
+
         if (neighbors.TOP) {
             neighbors.TOP.chunk.invalidate();
         }
@@ -82,7 +156,14 @@ export class Tile {
         return Math.abs(dx) + Math.abs(dy);
     }
 
-    public getTotalHeight() {
-        return this.height + this.water.waterLevel;
+    public changeWaterLevel(amount: number) {
+        this.waterLevel += amount;
+    }
+
+    public applyWaterLevelDelta() {
+        if (this.waterLevelDelta !== 0) {
+            this.waterLevel += this.waterLevelDelta;
+            this.waterLevelDelta = 0;
+        }
     }
 }

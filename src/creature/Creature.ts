@@ -20,7 +20,7 @@ export class Creature {
         this.world = world;
         this.position = world.getTileRandom();
         this.pathAgent = new PathAgent(pathAgentDefinition);
-        this.moveTimer = new Timer(100, this.move.bind(this));
+        this.moveTimer = new Timer(0.1, this.move.bind(this));
     }
 
     private move() {

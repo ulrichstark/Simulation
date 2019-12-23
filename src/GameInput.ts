@@ -1,4 +1,3 @@
-import { Chunk } from "./world/Chunk";
 import { Tile } from "./world/Tile";
 import { World } from "./world/World";
 import { Actions, ActionCameraMove } from "./Actions";
@@ -15,9 +14,7 @@ export class GameInput {
     private keyDownMap: boolean[] = [];
     private keyActionMap: KeyAction[] = [];
 
-    // TODO: no need for hovered chunk
-    public hoveredChunk: Chunk | null = null;
-    public hoveredTile: Tile | null = null;
+    public hoveredTile: Tile | undefined;
     public isPointerDown: boolean = false;
     public pointerX: number;
     public pointerY: number;
@@ -38,30 +35,17 @@ export class GameInput {
     }
 
     public update(pointerXPixel: number, pointerYPixel: number, worldView: WorldView) {
-        const { chunks } = this.world;
-        const { pixelsInTile, tilesInChunk } = GameConfig;
+        const { world, keyActionMap } = this;
+        const { pixelsInTile } = GameConfig;
         const { pixelOffsetX, pixelOffsetY } = worldView;
 
         this.pointerX = (pointerXPixel - pixelOffsetX) / pixelsInTile;
         this.pointerY = (pointerYPixel - pixelOffsetY) / pixelsInTile;
+        this.hoveredTile = world.getTile(Math.floor(this.pointerX), Math.floor(this.pointerY));
 
-        const chunkX = Math.floor(this.pointerX / tilesInChunk);
-        const chunkY = Math.floor(this.pointerY / tilesInChunk);
-        const tileX = Math.floor(this.pointerX % tilesInChunk);
-        const tileY = Math.floor(this.pointerY % tilesInChunk);
-
-        if (chunks[chunkX] && chunks[chunkX][chunkY]) {
-            const chunk = chunks[chunkX][chunkY];
-            this.hoveredChunk = chunk;
-            const tile = chunk.tiles[tileX][tileY];
-            this.hoveredTile = tile || null;
-        } else {
-            this.hoveredChunk = null;
-        }
-
-        for (const keyCode in this.keyActionMap) {
+        for (const keyCode in keyActionMap) {
             if (this.keyDownMap[keyCode]) {
-                const action = this.keyActionMap[keyCode];
+                const action = keyActionMap[keyCode];
                 action();
             }
         }
