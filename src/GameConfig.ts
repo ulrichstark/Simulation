@@ -1,6 +1,6 @@
 export class GameConfig {
     // GENERAL
-    public static readonly seed = Math.random() * 10000;
+    public static readonly seed = 6; //;Math.random() * 10000;
     public static readonly noiseScale = 0.02;
 
     // CAMERA

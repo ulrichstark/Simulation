@@ -12,6 +12,10 @@ export class RandomGenerator {
         return Math.floor(this.get01() * n);
     }
 
+    public static chance(chance01: number) {
+        return this.get01() <= chance01;
+    }
+
     public static getDirection() {
         return Directions[this.get0N(Directions.length)];
     }

@@ -41,23 +41,21 @@ export class PathAgent {
                 return tiles;
             }
 
-            for (const direction of Directions) {
-                const possibleOpenTile = tile.neighbors[direction.key];
-
-                if (possibleOpenTile && !openedNodes[possibleOpenTile.key]) {
-                    const cost = getCost(tile, possibleOpenTile);
+            for (const neighbor of tile.neighborsArray) {
+                if (!openedNodes[neighbor.key]) {
+                    const cost = getCost(tile, neighbor);
 
                     if (cost !== null) {
-                        const distance = getDistance(possibleOpenTile, to);
+                        const distance = getDistance(neighbor, to);
                         const score = node.score + cost + distance;
 
                         const nextNode: PathAgentNode = {
-                            tile: possibleOpenTile,
+                            tile: neighbor,
                             parent: node,
                             score: score
                         };
 
-                        openedNodes[possibleOpenTile.key] = true;
+                        openedNodes[neighbor.key] = true;
 
                         // TODO: Pathfinding optimization possible
                         let inserted = false;

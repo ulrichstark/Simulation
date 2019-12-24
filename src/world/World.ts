@@ -43,7 +43,11 @@ export class World {
                             const x = globalX + vector.x;
                             const y = globalY + vector.y;
 
-                            tile.neighbors[vector.key] = this.getTile(x, y);
+                            const neighbor = this.getTile(x, y);
+                            tile.neighborsMap[vector.key] = neighbor;
+                            if (neighbor) {
+                                tile.neighborsArray.push(neighbor);
+                            }
                         }
                     }
                 }
@@ -61,7 +65,12 @@ export class World {
         }
 
         for (const key in tiles) {
-            tiles[key].applyWaterLevelDelta();
+            const tile = tiles[key];
+            if (tile.waterLevelDelta !== 0) {
+                tile.waterLevel += tile.waterLevelDelta;
+                tile.waterLevelDelta = 0;
+            }
+            tile.waterFlowTarget = tile.waterFlowTargetNew;
         }
     }
 

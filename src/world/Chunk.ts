@@ -42,27 +42,27 @@ export class Chunk {
                 canvasContext.fillStyle = `rgb(30, ${120 + tile.height * 15}, 30)`;
                 canvasContext.fillRect(x, y, pixelsInTile, pixelsInTile);
 
-                if (tile.neighbors.LEFT && tile.height > tile.neighbors.LEFT.height) {
-                    canvasContext.fillStyle = `rgb(20, ${120 + tile.neighbors.LEFT.height * 10}, 20)`;
+                if (tile.neighborsMap.LEFT && tile.height > tile.neighborsMap.LEFT.height) {
+                    canvasContext.fillStyle = `rgb(20, ${120 + tile.neighborsMap.LEFT.height * 10}, 20)`;
                     canvasContext.fillRect(x, y, pixelsInTile * 0.2, pixelsInTile);
                 }
 
-                if (tile.neighbors.RIGHT && tile.height > tile.neighbors.RIGHT.height) {
-                    canvasContext.fillStyle = `rgb(20, ${120 + tile.neighbors.RIGHT.height * 10}, 20)`;
+                if (tile.neighborsMap.RIGHT && tile.height > tile.neighborsMap.RIGHT.height) {
+                    canvasContext.fillStyle = `rgb(20, ${120 + tile.neighborsMap.RIGHT.height * 10}, 20)`;
                     canvasContext.fillRect(x + pixelsInTile * 0.8, y, pixelsInTile * 0.2, pixelsInTile);
                 }
 
-                if (tile.neighbors.BOTTOM && tile.height > tile.neighbors.BOTTOM.height) {
-                    canvasContext.fillStyle = `rgb(14, ${100 + tile.neighbors.BOTTOM.height * 10}, 14)`;
+                if (tile.neighborsMap.BOTTOM && tile.height > tile.neighborsMap.BOTTOM.height) {
+                    canvasContext.fillStyle = `rgb(14, ${100 + tile.neighborsMap.BOTTOM.height * 10}, 14)`;
                     canvasContext.fillRect(x, y + pixelsInTile * 0.6, pixelsInTile, pixelsInTile * 0.4);
                 } else {
-                    if (tile.neighbors.BOTTOM_LEFT && tile.height > tile.neighbors.BOTTOM_LEFT.height) {
-                        canvasContext.fillStyle = `rgb(17, ${110 + tile.neighbors.BOTTOM_LEFT.height * 10}, 17)`;
+                    if (tile.neighborsMap.BOTTOM_LEFT && tile.height > tile.neighborsMap.BOTTOM_LEFT.height) {
+                        canvasContext.fillStyle = `rgb(17, ${110 + tile.neighborsMap.BOTTOM_LEFT.height * 10}, 17)`;
                         canvasContext.fillRect(x, y + pixelsInTile * 0.6, pixelsInTile * 0.2, pixelsInTile * 0.4);
                     }
 
-                    if (tile.neighbors.BOTTOM_RIGHT && tile.height > tile.neighbors.BOTTOM_RIGHT.height) {
-                        canvasContext.fillStyle = `rgb(17, ${110 + tile.neighbors.BOTTOM_RIGHT.height * 10}, 17)`;
+                    if (tile.neighborsMap.BOTTOM_RIGHT && tile.height > tile.neighborsMap.BOTTOM_RIGHT.height) {
+                        canvasContext.fillStyle = `rgb(17, ${110 + tile.neighborsMap.BOTTOM_RIGHT.height * 10}, 17)`;
                         canvasContext.fillRect(x + pixelsInTile * 0.8, y + pixelsInTile * 0.6, pixelsInTile * 0.2, pixelsInTile * 0.4);
                     }
                 }

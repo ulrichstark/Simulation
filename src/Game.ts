@@ -92,7 +92,7 @@ export class Game {
 
         if (isPointerDown && hoveredTile) {
             hoveredTile.setHeight(targetTileHeight);
-            const { neighbors } = hoveredTile;
+            const { neighborsMap: neighbors } = hoveredTile;
             if (neighbors.TOP) {
                 neighbors.TOP.setHeight(targetTileHeight);
             }
