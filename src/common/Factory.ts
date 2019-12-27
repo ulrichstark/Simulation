@@ -1,17 +1,6 @@
 import { DirectionMap, DirectionKey } from "./Direction";
 
 export class Factory {
-    public static createTwoDimensionalArray<T>(width: number, height: number, defaultValue: (x: number, y: number) => T): T[][] {
-        const array = Array(width);
-        for (let x = 0; x < width; x++) {
-            array[x] = Array(height);
-            for (let y = 0; y < height; y++) {
-                array[x][y] = defaultValue(x, y);
-            }
-        }
-        return array;
-    }
-
     public static createDirectionMap(defaultValue: any): DirectionMap<any> {
         return {
             [DirectionKey.TOP]: defaultValue,
@@ -25,7 +14,7 @@ export class Factory {
         };
     }
 
-    public static createTileKey(x: number, y: number) {
+    public static createVectorKey(x: number, y: number) {
         return `${x}_${y}`;
     }
 }

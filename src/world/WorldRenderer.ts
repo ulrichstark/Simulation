@@ -31,41 +31,41 @@ export class WorldRenderer {
 
         for (let ix = chunkStartX; ix <= chunkEndX; ix++) {
             for (let iy = chunkStartY; iy <= chunkEndY; iy++) {
-                const chunk = chunks[ix][iy];
+                const chunk = chunks.get(ix, iy);
                 const x = chunk.pixelX + pixelOffsetX;
                 const y = chunk.pixelY + pixelOffsetY;
 
                 chunk.render(canvasContext, x, y);
 
                 canvasContext.strokeStyle = "white";
-                for (let tx = 0; tx < tilesInChunk; tx++) {
-                    for (let ty = 0; ty < tilesInChunk; ty++) {
-                        const { globalPixelX, globalPixelY, globalX, globalY, waterLevel, waterFlowTarget } = chunk.tiles[tx][ty];
 
-                        //if (waterLevel !== 0) {
-                        canvasContext.fillStyle = `rgba(0, 0, 255, ${waterLevel === 0 ? 0 : 0.5})`;
-                        canvasContext.fillRect(globalPixelX + pixelOffsetX, globalPixelY + pixelOffsetY, pixelsInTile, pixelsInTile);
-                        //}
+                const { array } = chunk.tiles;
+                for (const tile of array) {
+                    const { globalPixelX, globalPixelY, globalX, globalY, waterLevel, waterFlowTarget } = tile;
 
-                        if (waterFlowTarget) {
-                            const centerX = globalPixelX + pixelOffsetX + pixelsInTile * 0.5;
-                            const centerY = globalPixelY + pixelOffsetY + pixelsInTile * 0.5;
-                            const lengthFactor = pixelsInTile;
-                            let waterFlowX = waterFlowTarget.globalX - globalX;
-                            let waterFlowY = waterFlowTarget.globalY - globalY;
-                            const distance = Math.sqrt(waterFlowX * waterFlowX + waterFlowY * waterFlowY);
-                            waterFlowX /= distance;
-                            waterFlowY /= distance;
+                    //if (waterLevel !== 0) {
+                    canvasContext.fillStyle = `rgba(0, 0, 255, ${waterLevel === 0 ? 0 : 0.5})`;
+                    canvasContext.fillRect(globalPixelX + pixelOffsetX, globalPixelY + pixelOffsetY, pixelsInTile, pixelsInTile);
+                    //}
 
-                            canvasContext.beginPath();
-                            canvasContext.moveTo(centerX, centerY);
-                            canvasContext.lineTo(centerX + waterFlowX * lengthFactor, centerY + waterFlowY * lengthFactor);
-                            //canvasContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
-                            canvasContext.closePath();
-                            canvasContext.stroke();
-                            //canvasContext.fillStyle = "red";
-                            //canvasContext.fill();
-                        }
+                    if (waterFlowTarget) {
+                        const centerX = globalPixelX + pixelOffsetX + pixelsInTile * 0.5;
+                        const centerY = globalPixelY + pixelOffsetY + pixelsInTile * 0.5;
+                        const lengthFactor = pixelsInTile;
+                        let waterFlowX = waterFlowTarget.globalX - globalX;
+                        let waterFlowY = waterFlowTarget.globalY - globalY;
+                        const distance = Math.sqrt(waterFlowX * waterFlowX + waterFlowY * waterFlowY);
+                        waterFlowX /= distance;
+                        waterFlowY /= distance;
+
+                        canvasContext.beginPath();
+                        canvasContext.moveTo(centerX, centerY);
+                        canvasContext.lineTo(centerX + waterFlowX * lengthFactor, centerY + waterFlowY * lengthFactor);
+                        //canvasContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+                        canvasContext.closePath();
+                        canvasContext.stroke();
+                        //canvasContext.fillStyle = "red";
+                        //canvasContext.fill();
                     }
                 }
             }

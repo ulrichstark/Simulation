@@ -57,7 +57,7 @@ export class Tile {
         this.globalY = tileStartY + localY;
         this.globalPixelX = pixelX + this.localPixelX;
         this.globalPixelY = pixelY + this.localPixelY;
-        this.key = Factory.createTileKey(this.globalX, this.globalY);
+        this.key = Factory.createVectorKey(this.globalX, this.globalY);
         this.neighborsMap = Factory.createDirectionMap(undefined);
         this.waterLevel = RandomGenerator.get01();
         this.waterLevelDelta = 0;

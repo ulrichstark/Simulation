@@ -6,15 +6,16 @@ import { SimplexNoise } from "../common/SimplexNoise";
 import { Directions } from "../common/Direction";
 import { RandomGenerator } from "../common/RandomGenerator";
 import { TileMountMethod, Tile } from "./Tile";
+import { Map } from "../common/Map";
 
 const logger = new Logger("World");
 
 export class World {
-    public chunks: Chunk[][];
-    public tiles: { [key: string]: Tile } = {};
+    public chunks: Map<Chunk>;
+    private tiles: { [key: string]: Tile } = {};
 
     constructor() {
-        const { seed, chunksXInWorld, chunksYInWorld, tilesXInWorld, tilesYInWorld, tilesInChunk, noiseScale } = GameConfig;
+        const { seed, chunksXInWorld, chunksYInWorld, tilesXInWorld, tilesYInWorld, noiseScale } = GameConfig;
 
         const noise = new SimplexNoise(seed);
 
@@ -26,29 +27,24 @@ export class World {
             this.tiles[tile.key] = tile;
         };
 
-        this.chunks = Factory.createTwoDimensionalArray(chunksXInWorld, chunksYInWorld, (x, y) => new Chunk(x, y, tileMountMethod));
+        this.chunks = new Map(chunksXInWorld, chunksYInWorld, (x, y) => new Chunk(x, y, tileMountMethod));
 
         logger.log(`Created with ${tilesXInWorld}x${tilesYInWorld} = ${tilesXInWorld * tilesYInWorld} tiles!`);
 
-        for (let cx = 0; cx < chunksXInWorld; cx++) {
-            for (let cy = 0; cy < chunksYInWorld; cy++) {
-                const { tiles } = this.chunks[cx][cy];
+        for (const chunk of this.chunks.array) {
+            const { array } = chunk.tiles;
 
-                for (let tx = 0; tx < tilesInChunk; tx++) {
-                    for (let ty = 0; ty < tilesInChunk; ty++) {
-                        const tile = tiles[tx][ty];
-                        const { globalX, globalY } = tile;
+            for (const tile of array) {
+                const { globalX, globalY } = tile;
 
-                        for (const vector of Directions) {
-                            const x = globalX + vector.x;
-                            const y = globalY + vector.y;
+                for (const vector of Directions) {
+                    const x = globalX + vector.x;
+                    const y = globalY + vector.y;
 
-                            const neighbor = this.getTile(x, y);
-                            tile.neighborsMap[vector.key] = neighbor;
-                            if (neighbor) {
-                                tile.neighborsArray.push(neighbor);
-                            }
-                        }
+                    const neighbor = this.getTile(x, y);
+                    tile.neighborsMap[vector.key] = neighbor;
+                    if (neighbor) {
+                        tile.neighborsArray.push(neighbor);
                     }
                 }
             }
@@ -75,13 +71,13 @@ export class World {
     }
 
     public getTile(x: number, y: number): Tile | undefined {
-        return this.tiles[Factory.createTileKey(x, y)];
+        return this.tiles[Factory.createVectorKey(x, y)];
     }
 
     public getTileRandom(): Tile {
         const { tilesXInWorld, tilesYInWorld } = GameConfig;
         const x = RandomGenerator.get0N(tilesXInWorld);
         const y = RandomGenerator.get0N(tilesYInWorld);
-        return this.tiles[Factory.createTileKey(x, y)];
+        return this.tiles[Factory.createVectorKey(x, y)];
     }
 }
