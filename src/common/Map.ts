@@ -2,7 +2,7 @@ import { Factory } from "./Factory";
 import { RandomGenerator } from "./RandomGenerator";
 
 export class Map<T> {
-    public map: { [key: string]: T } = {};
+    public dictionary: { [key: string]: T } = {};
     public array: T[] = [];
 
     constructor(width: number, height: number, defaultValue: (x: number, y: number) => T) {
@@ -10,14 +10,14 @@ export class Map<T> {
             for (let y = 0; y < height; y++) {
                 const key = Factory.createVectorKey(x, y);
                 const value = defaultValue(x, y);
-                this.map[key] = value;
+                this.dictionary[key] = value;
                 this.array.push(value);
             }
         }
     }
 
     public get(x: number, y: number): T {
-        return this.map[Factory.createVectorKey(x, y)];
+        return this.dictionary[Factory.createVectorKey(x, y)];
     }
 
     public getRandom(): T {

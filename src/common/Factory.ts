@@ -1,7 +1,7 @@
 import { DirectionMap, DirectionKey } from "./Direction";
 
 export class Factory {
-    public static createDirectionMap(defaultValue: any): DirectionMap<any> {
+    public static createDirectionMap<T>(defaultValue: T): DirectionMap<T> {
         return {
             [DirectionKey.TOP]: defaultValue,
             [DirectionKey.TOP_RIGHT]: defaultValue,
