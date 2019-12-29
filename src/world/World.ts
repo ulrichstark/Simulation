@@ -12,7 +12,7 @@ const logger = new Logger("World");
 
 export class World {
     public chunks: Map<Chunk>;
-    private tiles: { [key: string]: Tile } = {};
+    private tiles: Record<string, Tile> = {};
 
     constructor() {
         const { seed, chunksXInWorld, chunksYInWorld, tilesXInWorld, tilesYInWorld, noiseScale } = GameConfig;

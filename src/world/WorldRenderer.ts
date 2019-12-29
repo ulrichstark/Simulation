@@ -43,10 +43,11 @@ export class WorldRenderer {
                 for (const tile of array) {
                     const { globalPixelX, globalPixelY, globalX, globalY, waterLevel, waterFlowTarget } = tile;
 
-                    //if (waterLevel !== 0) {
-                    canvasContext.fillStyle = `rgba(0, 0, 255, ${waterLevel === 0 ? 0 : 0.5})`;
-                    canvasContext.fillRect(globalPixelX + pixelOffsetX, globalPixelY + pixelOffsetY, pixelsInTile, pixelsInTile);
-                    //}
+                    if (waterLevel !== 0) {
+                        canvasContext.fillStyle = `rgba(0, 0, 255, ${Math.min(1, Math.abs(waterLevel) * 0.5 + 0.2)})`;
+                        // canvasContext.fillStyle = `rgba(0, 0, 255, ${waterLevel === 0 ? 0 : 0.5})`;
+                        canvasContext.fillRect(globalPixelX + pixelOffsetX, globalPixelY + pixelOffsetY, pixelsInTile, pixelsInTile);
+                    }
 
                     if (waterFlowTarget) {
                         const centerX = globalPixelX + pixelOffsetX + pixelsInTile * 0.5;

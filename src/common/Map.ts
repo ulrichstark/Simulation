@@ -2,7 +2,7 @@ import { Factory } from "./Factory";
 import { RandomGenerator } from "./RandomGenerator";
 
 export class Map<T> {
-    public dictionary: { [key: string]: T } = {};
+    public dictionary: Record<string, T> = {};
     public array: T[] = [];
 
     constructor(width: number, height: number, defaultValue: (x: number, y: number) => T) {
