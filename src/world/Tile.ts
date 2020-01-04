@@ -1,10 +1,15 @@
 import { Chunk } from "./Chunk";
-import { DirectionMap, Directions } from "../common/Direction";
+import { DirectionMap, Directions, Direction, DirectionsDirect, applyVectorToDirections } from "../common/Direction";
 import { Factory } from "../common/Factory";
 import { GameConfig } from "../GameConfig";
 import { RandomGenerator } from "../common/RandomGenerator";
+import { TileWaterPhysics } from "./TileWaterPhysics";
 
 export type TileMountMethod = (tile: Tile) => void;
+
+function calculateHeightCombined(tileHeight: number, waterLevel: number) {
+    return tileHeight + waterLevel * 0.01;
+}
 
 export class Tile {
     public chunk: Chunk;
@@ -25,7 +30,7 @@ export class Tile {
     }
     public set height(value: number) {
         this._height = value;
-        this.heightCombined = value + this._waterLevel;
+        this.heightCombined = calculateHeightCombined(value, this._waterLevel);
     }
 
     private _waterLevel: number;
@@ -34,15 +39,13 @@ export class Tile {
     }
     public set waterLevel(value: number) {
         this._waterLevel = value;
-        this.heightCombined = value + this._height;
+        this.heightCombined = calculateHeightCombined(this._height, value);
     }
 
     public heightCombined: number;
-    public waterLevelDelta: number;
-    public waterFlowTarget: Tile | null;
-    public waterFlowTargetNew: Tile | null;
     public neighborsMap: DirectionMap<Tile | undefined>;
     public neighborsArray: Tile[] = [];
+    public waterPhysics: TileWaterPhysics;
 
     constructor(localX: number, localY: number, chunk: Chunk, tileMountMethod: TileMountMethod) {
         const { pixelsInTile } = GameConfig;
@@ -59,55 +62,14 @@ export class Tile {
         this.globalPixelY = pixelY + this.localPixelY;
         this.key = Factory.createVectorKey(this.globalX, this.globalY);
         this.neighborsMap = Factory.createDirectionMap(undefined);
-        this.waterLevel = RandomGenerator.get01();
-        this.waterLevelDelta = 0;
-        this.waterFlowTarget = null;
+        this.waterLevel = RandomGenerator.get0N(100);
+        this.waterPhysics = new TileWaterPhysics(this);
 
         tileMountMethod(this);
     }
 
     public update(deltaTime: number) {
-        const { minimalHeightDiffForWaterFlow, waterFlowSpeed } = GameConfig;
-        const { waterFlowTarget, waterLevel, heightCombined } = this;
-        const minimalHeightDiff = this.waterLevel < minimalHeightDiffForWaterFlow ? -1 : minimalHeightDiffForWaterFlow;
-
-        if (waterFlowTarget === null || heightCombined - waterFlowTarget.heightCombined < minimalHeightDiff) {
-            this.waterFlowTargetNew = this.findWaterFlowTarget(minimalHeightDiff);
-        } else {
-            const movingWater = Math.min(waterLevel, deltaTime * waterFlowSpeed);
-
-            waterFlowTarget.waterLevelDelta += movingWater;
-            this.waterLevelDelta -= movingWater;
-        }
-    }
-
-    public findWaterFlowTarget(minimalHeightDiff: number) {
-        const { heightCombined, neighborsArray, height } = this;
-        let lowestNeighbor = null;
-        let lowestHeight = heightCombined;
-
-        for (const neighbor of neighborsArray) {
-            const { height: neighborHeight, heightCombined: neighborTotalHeight } = neighbor;
-
-            if (neighborHeight <= height) {
-                if (heightCombined - neighborTotalHeight >= minimalHeightDiff && neighborTotalHeight < lowestHeight) {
-                    lowestHeight = neighborTotalHeight;
-                    lowestNeighbor = neighbor;
-                }
-
-                const { waterFlowTarget } = neighbor;
-                if (waterFlowTarget) {
-                    const flowTargetTotalHeight = waterFlowTarget.heightCombined;
-
-                    if (heightCombined - flowTargetTotalHeight >= minimalHeightDiff && flowTargetTotalHeight < lowestHeight) {
-                        lowestHeight = flowTargetTotalHeight;
-                        lowestNeighbor = neighbor;
-                    }
-                }
-            }
-        }
-
-        return lowestNeighbor;
+        this.waterPhysics.update(deltaTime);
     }
 
     public setHeight(newHeight: number) {
@@ -147,9 +109,5 @@ export class Tile {
         const dx = this.globalX - tile.globalX;
         const dy = this.globalY - tile.globalY;
         return Math.abs(dx) + Math.abs(dy);
-    }
-
-    public changeWaterLevel(amount: number) {
-        this.waterLevel += amount;
     }
 }

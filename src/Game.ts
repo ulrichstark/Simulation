@@ -105,10 +105,7 @@ export class Game {
             if (neighbors.RIGHT) {
                 neighbors.RIGHT.setHeight(targetTileHeight);
             }
-        }
-
-        if (hoveredTile) {
-            console.log(hoveredTile.waterLevel);
+            console.log(hoveredTile);
         }
 
         world.update(deltaTime);

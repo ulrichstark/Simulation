@@ -14,7 +14,7 @@ export class GameConfig {
 
     // WATER
     public static readonly minimalHeightDiffForWaterFlow = 0.1;
-    public static readonly waterFlowSpeed = 2;
+    public static readonly waterFlowSpeed = 100;
 
     // CALCULATIONS
     public static readonly pixelsInChunk = GameConfig.tilesInChunk * GameConfig.pixelsInTile;

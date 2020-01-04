@@ -60,14 +60,13 @@ export class World {
             tiles[key].update(deltaTime);
         }
 
+        let totalWater = 0;
         for (const key in tiles) {
             const tile = tiles[key];
-            if (tile.waterLevelDelta !== 0) {
-                tile.waterLevel += tile.waterLevelDelta;
-                tile.waterLevelDelta = 0;
-            }
-            tile.waterFlowTarget = tile.waterFlowTargetNew;
+            tile.waterPhysics.apply();
+            totalWater += tile.waterLevel;
         }
+        // console.log(totalWater);
     }
 
     public getTile(x: number, y: number): Tile | undefined {

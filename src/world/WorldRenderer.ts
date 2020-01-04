@@ -41,33 +41,28 @@ export class WorldRenderer {
 
                 const { array } = chunk.tiles;
                 for (const tile of array) {
-                    const { globalPixelX, globalPixelY, globalX, globalY, waterLevel, waterFlowTarget } = tile;
+                    const { globalPixelX, globalPixelY, waterPhysics, waterLevel } = tile;
+                    const { flowX, flowY } = waterPhysics;
 
                     if (waterLevel !== 0) {
-                        canvasContext.fillStyle = `rgba(0, 0, 255, ${Math.min(1, Math.abs(waterLevel) * 0.5 + 0.2)})`;
+                        canvasContext.fillStyle = `rgba(0, 0, 255, ${Math.min(1, Math.abs(waterLevel) * 0.005 + 0.0)})`;
                         // canvasContext.fillStyle = `rgba(0, 0, 255, ${waterLevel === 0 ? 0 : 0.5})`;
                         canvasContext.fillRect(globalPixelX + pixelOffsetX, globalPixelY + pixelOffsetY, pixelsInTile, pixelsInTile);
                     }
 
-                    if (waterFlowTarget) {
-                        const centerX = globalPixelX + pixelOffsetX + pixelsInTile * 0.5;
-                        const centerY = globalPixelY + pixelOffsetY + pixelsInTile * 0.5;
-                        const lengthFactor = pixelsInTile;
-                        let waterFlowX = waterFlowTarget.globalX - globalX;
-                        let waterFlowY = waterFlowTarget.globalY - globalY;
-                        const distance = Math.sqrt(waterFlowX * waterFlowX + waterFlowY * waterFlowY);
-                        waterFlowX /= distance;
-                        waterFlowY /= distance;
+                    const centerX = globalPixelX + pixelOffsetX + pixelsInTile * 0.5;
+                    const centerY = globalPixelY + pixelOffsetY + pixelsInTile * 0.5;
+                    // const distance = Math.sqrt(waterFlowX * waterFlowX + waterFlowY * waterFlowY);
+                    const lengthFactor = 1;
 
-                        canvasContext.beginPath();
-                        canvasContext.moveTo(centerX, centerY);
-                        canvasContext.lineTo(centerX + waterFlowX * lengthFactor, centerY + waterFlowY * lengthFactor);
-                        //canvasContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
-                        canvasContext.closePath();
-                        canvasContext.stroke();
-                        //canvasContext.fillStyle = "red";
-                        //canvasContext.fill();
-                    }
+                    canvasContext.beginPath();
+                    canvasContext.moveTo(centerX, centerY);
+                    canvasContext.lineTo(centerX + flowX * lengthFactor, centerY + flowY * lengthFactor);
+                    //canvasContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+                    canvasContext.closePath();
+                    //canvasContext.stroke();
+                    //canvasContext.fillStyle = "red";
+                    //canvasContext.fill();
                 }
             }
         }
